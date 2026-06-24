@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calendario de Servicios - GEYSEM</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100 font-sans antialiased text-gray-800">
+
+    <div class="max-w-7xl mx-auto p-4 md:p-6 space-y-6">
+        
+        <!-- Encabezado y Logo -->
+        <div class="bg-white rounded-xl shadow-sm p-6 border-l-4 border-blue-600 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div class="flex items-center gap-4">
+                <!-- LOGO GEYSEM: Cambia el 'src' por la ruta de tu logo real (ej. 'img/logo-geysem.png') -->
+                <div class="w-14 h-14 bg-blue-100 rounded-full flex items-center justify-center border-2 border-blue-600 shadow-sm overflow-hidden flex-shrink-0">
+                    <img src="https://ui-avatars.com/api/?name=GEYSEM&background=2563EB&color=fff&rounded=true&bold=true&font-size=0.3" alt="Logo GEYSEM" class="w-full h-full object-cover">
+                </div>
+                <div>
+                    <h1 class="text-2xl font-bold text-gray-900">Control y Calendario de Servicios</h1>
+                    <p id="rol-indicador" class="text-sm text-gray-500">Programación, alcances y registro fotográfico de campo</p>
+                </div>
+            </div>
+            <button id="btn-nuevo-servicio" onclick="abrirModalNueva()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-lg font-medium text-sm transition-colors flex items-center justify-center gap-2 shadow-sm">
+                <i class="fas fa-plus"></i> Nuevo Servicio
+            </button>
+        </div>
+
+        <!-- Leyenda de Folios -->
+        <div class="bg-white rounded-xl shadow-sm p-4 border border-gray-100">
+            <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Clasificación de Servicios (Folios)</h3>
+            <div class="flex flex-wrap gap-2 text-xs font-bold">
+                <span class="px-2 py-1 rounded bg-red-600 text-white shadow-sm">CAF</span>
+                <span class="px-2 py-1 rounded bg-orange-500 text-white shadow-sm">PRE</span>
+                <span class="px-2 py-1 rounded bg-emerald-800 text-white shadow-sm">COR</span>
+                <span class="px-2 py-1 rounded bg-gray-500 text-white shadow-sm">INS</span>
+                <span class="px-2 py-1 rounded bg-green-400 text-gray-900 shadow-sm">REV</span>
+                <span class="px-2 py-1 rounded bg-yellow-400 text-gray-900 shadow-sm">DIG</span>
+                <span class="px-2 py-1 rounded bg-purple-300 text-purple-950 shadow-sm">ACT</span>
+                <span class="px-2 py-1 rounded bg-sky-400 text-gray-900 shadow-sm">PUE</span>
+                <span class="px-2 py-1 rounded bg-pink-400 text-gray-900 shadow-sm">ESP</span>
+                <span class="px-2 py-1 rounded bg-amber-600 text-white shadow-sm">EME</span>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            
+            <!-- Calendario -->
+            <div class="lg:col-span-2 bg-white rounded-xl shadow-sm p-6 space-y-4">
+                <div class="flex items-center justify-between">
+                    <h2 id="mes-año-titulo" class="text-lg font-bold text-gray-900 capitalize">Cargando...</h2>
+                    <div class="flex gap-2">
+                        <button onclick="cambiarMes(-1)" class="p-2 hover:bg-gray-100 rounded-lg text-gray-600 transition-colors"><i class="fas fa-chevron-left"></i></button>
+                        <button onclick="irAHoy()" class="px-3 py-1 text-sm font-medium hover:bg-gray-100 rounded-lg text-blue-600 transition-colors border border-blue-200">Hoy</button>
+                        <button onclick="cambiarMes(1)" class="p-2 hover:bg-gray-100 rounded-lg text-gray-600 transition-colors"><i class="fas fa-chevron-right"></i></button>
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-7 text-center text-xs font-bold text-gray-500 tracking-wider uppercase border-b pb-2">
+                    <div>Dom</div><div>Lun</div><div>Mar</div><div>Mié</div><div>Jue</div><div>Vie</div><div>Sáb</div>
+                </div>
+                
+                <div id="calendario-dias" class="grid grid-cols-7 gap-1 text-sm"></div>
+            </div>
+            
+            <!-- Agenda del Día -->
+            <div class="space-y-4">
+                <div class="flex items-center justify-between px-1">
+                    <h2 class="text-lg font-bold text-gray-900 flex items-center gap-2">
+                        <i class="fas fa-calendar-day text-blue-600"></i> 
+                        <span id="agenda-titulo">Agenda del día</span>
+                    </h2>
+                    <button onclick="cargarDatosNube()" class="text-xs bg-gray-200 hover:bg-gray-300 text-gray-700 px-2 py-1 rounded transition-colors flex items-center gap-1 shadow-sm">
+                        <i class="fas fa-sync-alt"></i> Sincronizar
+                    </button>
+                </div>
+                <div id="agenda-servicios-contenedor" class="space-y-4"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Servicio -->
+    <div id="modal-servicio" class="hidden fixed inset-0 bg-gray-900/60 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-xl shadow-xl max-w-lg w-full max-h-[90vh] overflow-y-auto flex flex-col">
+            <div class="p-5 border-b flex items-center justify-between sticky top-0 bg-white z-10">
+                <h3 id="modal-titulo" class="text-lg font-bold text-gray-900">Programar Nuevo Servicio</h3>
+                <button type="button" onclick="cerrarModal()" class="text-gray-400 hover:text-gray-600 p-1.5 hover:bg-gray-100 rounded-lg transition-colors">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            
+            <form id="formulario-servicio" onsubmit="guardarServicio(event)" class="p-5 space-y-4 flex-1">
+                <input type="hidden" id="input-id">
+
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">Nombre del Cliente o Empresa</label>
+                    <input type="text" id="input-cliente" required placeholder="Nombre de la empresa" class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-blue-500">
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">Representación</label>
+                        <select id="input-representacion" class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-blue-500">
+                            <option value="Directo GEYSEM">Directo (GEYSEM)</option>
+                            <option value="Subcontratado">Subcontratado</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">Folio / Tipo</label>
+                        <input type="text" id="input-folio" required placeholder="CAF-001" class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-blue-500 uppercase">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">Fecha</label>
+                        <input type="date" id="input-fecha" required class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">Hora de Llegada</label>
+                        <input type="time" id="input-hora" required class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-blue-500">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">Dirección del Servicio</label>
+                    <input type="text" id="input-direccion" required placeholder="Dirección completa" class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-blue-500">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">Alcances</label>
+                    <textarea id="input-alcances" rows="2" placeholder="¿Qué se va a realizar?" class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-blue-500"></textarea>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">Notas Especiales</label>
+                    <textarea id="input-notas" rows="2" placeholder="Indicaciones adicionales" class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-blue-500"></textarea>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">Fotos del Equipo</label>
+                    <div class="mt-1 relative border-2 border-gray-300 border-dashed rounded-lg p-4 hover:bg-gray-50/50 flex flex-col items-center justify-center cursor-pointer transition-colors">
+                        <input type="file" id="input-fotos" multiple accept="image/*" onchange="procesarFotosOndemand(event)" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
+                        <i class="fas fa-camera text-gray-400 text-2xl mb-1"></i>
+                        <span id="texto-fotos" class="text-xs font-medium text-blue-600">Haga clic para seleccionar fotos</span>
+                    </div>
+                    <div id="vista-previa-imagenes-modal" class="grid grid-cols-5 gap-2 mt-2"></div>
+                </div>
+
+                <div class="pt-4 border-t flex flex-col sm:flex-row justify-between gap-3">
+                    <button type="button" id="btn-eliminar" onclick="eliminarServicioAccion()" class="hidden px-4 py-2 bg-red-50 text-red-600 border border-red-200 text-sm font-semibold rounded-lg hover:bg-red-100 transition-colors">
+                        <i class="fas fa-trash-alt mr-1"></i> Eliminar
+                    </button>
+                    <div class="flex justify-end gap-3 ml-auto w-full sm:w-auto">
+                        <button type="button" onclick="cerrarModal()" class="px-4 py-2 border text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-50 w-full sm:w-auto">Cancelar</button>
+                        <button type="submit" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg shadow-sm w-full sm:w-auto">Guardar</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const meses = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+        let fechaActual = new Date();
+        let fechaSeleccionada = new Date();
+        let fotosTemporalesBase64 = []; 
+        let serviciosDB = [];
+
+        // DETERMINACIÓN DE PERMISOS
+        const urlParams = new URLSearchParams(window.location.search);
+        const esTecnico = urlParams.get('rol') === 'tecnico';
+
+        // NUBE SIMULADA
+        const BIN_ID = "66786c47ad19ca34f87da645"; 
+        const API_URL = `https://api.jsonbin.io/v3/b/${BIN_ID}`;
+        const API_KEY = "$2a$10$wR63P9bU.Vb1SgPq8m/OQ.3R1zR/X8FhZfREbXf5nUuSihzTf29mO"; 
+
+        if (esTecnico) {
+            document.addEventListener("DOMContentLoaded", () => {
+                document.getElementById("btn-nuevo-servicio").classList.add("hidden");
+                document.getElementById("rol-indicador").innerText = "Vista de Consulta para Técnicos (Solo Lectura)";
+                document.getElementById("rol-indicador").classList.add("text-amber-600", "font-semibold");
+            });
+        }
+
+        async function cargarDatosNube() {
+            try {
+                const res = await fetch(API_URL, { headers: { "X-Master-Key": API_KEY } });
+                const data = await res.json();
+                serviciosDB = data.record.servicios || [];
+                renderizarCalendario();
+            } catch (err) {
+                console.error("Error nube, usando local", err);
+                serviciosDB = JSON.parse(localStorage.getItem('geysem_servicios')) || [];
+                renderizarCalendario();
+            }
+        }
+
+        async function actualizarNube() {
+            localStorage.setItem('geysem_servicios', JSON.stringify(serviciosDB));
+            try {
+                await fetch(API_URL, {
+                    method: "PUT",
+                    headers: { "Content-Type": "application/json", "X-Master-Key": API_KEY },
+                    body: JSON.stringify({ servicios: serviciosDB })
+                });
+            } catch (err) { console.error("Error subir", err); }
+        }
+
+        function obtenerColorEtiqueta(folio) {
+            if (!folio) return { bg: 'bg-gray-500', text: 'text-white', border: 'border-gray-500', badge: 'bg-gray-100 text-gray-800' };
+            const tresLetras = folio.trim().substring(0, 3).toUpperCase();
+            switch (tresLetras) {
+                case "CAF": return { bg: 'bg-red-600', text: 'text-white', border: 'border-red-600', badge: 'bg-red-100 text-red-800' };
+                case "PRE": return { bg: 'bg-orange-500', text: 'text-white', border: 'border-orange-500', badge: 'bg-orange-100 text-orange-800' };
+                case "COR": return { bg: 'bg-emerald-800', text: 'text-white', border: 'border-emerald-800', badge: 'bg-emerald-100 text-emerald-900' };
+                case "INS": return { bg: 'bg-gray-500', text: 'text-white', border: 'border-gray-500', badge: 'bg-gray-100 text-gray-700' };
+                case "REV": return { bg: 'bg-green-400', text: 'text-gray-900', border: 'border-green-400', badge: 'bg-green-100 text-green-800' };
+                case "DIG": return { bg: 'bg-yellow-400', text: 'text-gray-900', border: 'border-yellow-400', badge: 'bg-yellow-100 text-yellow-800' };
+                case "ACT": return { bg: 'bg-purple-300', text: 'text-purple-950', border: 'border-purple-300', badge: 'bg-purple-100 text-purple-800' };
+                case "PUE": return { bg: 'bg-sky-400', text: 'text-gray-900', border: 'border-sky-400', badge: 'bg-sky-100 text-sky-800' };
+                case "ESP": return { bg: 'bg-pink-400', text: 'text-gray-900', border: 'border-pink-400', badge: 'bg-pink-100 text-pink-800' };
+                case "EME": return { bg: 'bg-amber-600', text: 'text-white', border: 'border-amber-600', badge: 'bg-amber-100 text-amber-800' };
+                default: return { bg: 'bg-blue-600', text: 'text-white', border: 'border-blue-600', badge: 'bg-blue-100 text-blue-800' };
+            }
+        }
+
+        function renderizarCalendario() {
+            const año = fechaActual.getFullYear();
+            const mes = fechaActual.getMonth();
+            document.getElementById("mes-año-titulo").innerText = `${meses[mes]} ${año}`;
+
+            const primerDiaMes = new Date(año, mes, 1).getDay();
+            const totalDiasMes = new Date(año, mes + 1, 0).getDate();
+            const totalDiasMesAnterior = new Date(año, mes, 0).getDate();
+
+            const contenedorDias = document.getElementById("calendario-dias");
+            contenedorDias.innerHTML = "";
+            
+            // Determinar la fecha de HOY real
+            const fechaHoy = new Date();
+            const stringHoy = formatearFechaAString(fechaHoy);
+
+            for (let i = primerDiaMes; i > 0; i--) {
+                const diaS = totalDiasMesAnterior - i + 1;
+                contenedorDias.innerHTML += `<div class="h-28 p-1 text-gray-400 bg-gray-50/50 border border-gray-100 rounded-lg text-left"></div>`;
+            }
+
+            for (let dia = 1; dia <= totalDiasMes; dia++) {
+                const mesFormateado = String(mes + 1).padStart(2, '0');
+                const diaFormateado = String(dia).padStart(2, '0');
+                const fechaId = `${año}-${mesFormateado}-${diaFormateado}`;
+
+                const serviciosDelDia = serviciosDB.filter(s => s.fecha === fechaId);
+                const esSeleccionado = fechaId === formatearFechaAString(fechaSeleccionada);
+                const esHoyReal = fechaId === stringHoy;
+
+                // Clases dinámicas dependiendo de si es hoy, si está seleccionado o si es un día normal
+                let claseCelda = 'border-gray-100 hover:bg-gray-50 text-gray-700';
+                let estiloDiaNumero = 'text-xs font-bold';
+
+                if (esSeleccionado) {
+                    claseCelda = 'ring-2 ring-blue-600 bg-blue-50/30 text-blue-900 border-transparent';
+                } else if (esHoyReal) {
+                    // Resaltado específico para el DÍA ACTUAL
+                    claseCelda = 'border-2 border-blue-400 bg-blue-50/10 text-blue-700 shadow-sm';
+                    estiloDiaNumero = 'text-sm font-extrabold bg-blue-100 text-blue-700 rounded-full w-6 h-6 flex items-center justify-center';
+                }
+
+                let htmlEtiquetas = '';
+                serviciosDelDia.forEach(s => {
+                    const color = obtenerColorEtiqueta(s.folio);
+                    // IMPORTANTE: Al hacer clic en la etiqueta, se abre el modal directo (stopPropagation evita seleccionar el día)
+                    htmlEtiquetas += `<span onclick="manejarClicEtiqueta(event, ${s.id})" class="${color.bg} ${color.text} text-[10px] px-1 py-0.5 rounded truncate block w-full mt-1 font-bold cursor-pointer hover:opacity-80 transition-opacity shadow-sm" title="${s.cliente} - ${s.representacion}">${s.folio}</span>`;
+                });
+
+                contenedorDias.innerHTML += `
+                    <div onclick="seleccionarFecha('${fechaId}')" class="h-28 p-1.5 ${claseCelda} font-medium rounded-lg transition-all cursor-pointer border flex flex-col text-left overflow-hidden">
+                        <div class="${estiloDiaNumero} mb-1">${dia}</div>
+                        <div class="w-full overflow-y-auto space-y-0.5 flex-1 scrollbar-none">
+                            ${htmlEtiquetas}
+                        </div>
+                    </div>
+                `;
+            }
+            actualizarVistaAgenda();
+        }
+
+        // Nueva función para atrapar el clic directo en la etiqueta de color
+        function manejarClicEtiqueta(event, id) {
+            event.stopPropagation(); // Evita que se dispare seleccionarFecha()
+            if(!esTecnico) {
+                abrirModalEditar(id);
+            }
+        }
+
+        function seleccionarFecha(fechaString) {
+            fechaSeleccionada = new Date(fechaString + 'T00:00:00');
+            renderizarCalendario();
+        }
+
+        function procesarFotosOndemand(event) {
+            const archivos = event.target.files;
+            const vistaPrevia = document.getElementById("vista-previa-imagenes-modal");
+
+            Array.from(archivos).forEach(archivo => {
+                const lector = new FileReader();
+                lector.onload = function(e) {
+                    const img = new Image();
+                    img.onload = function() {
+                        const canvas = document.createElement('canvas');
+                        const MAX_WIDTH = 400; 
+                        const scaleSize = MAX_WIDTH / img.width;
+                        canvas.width = MAX_WIDTH;
+                        canvas.height = img.height * scaleSize;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                        const dataUrlComprimida = canvas.toDataURL('image/jpeg', 0.6);
+                        
+                        fotosTemporalesBase64.push(dataUrlComprimida);
+                        document.getElementById("texto-fotos").innerText = `${fotosTemporalesBase64.length} foto(s) preparadas`;
+
+                        vistaPrevia.innerHTML += `
+                            <div class="relative bg-gray-100 aspect-square rounded-md overflow-hidden border shadow-sm group">
+                                <img src="${dataUrlComprimida}" class="w-full h-full object-cover">
+                            </div>
+                        `;
+                    };
+                    img.src = e.target.result;
+                };
+                lector.readAsDataURL(archivo);
+            });
+        }
+
+        function actualizarVistaAgenda() {
+            const fechaString = formatearFechaAString(fechaSeleccionada);
+            const opciones = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            document.getElementById("agenda-titulo").innerText = fechaSeleccionada.toLocaleDateString('es-ES', opciones);
+
+            const serviciosDelDia = serviciosDB.filter(s => s.fecha === fechaString);
+            const contenedor = document.getElementById("agenda-servicios-contenedor");
+            contenedor.innerHTML = "";
+
+            if (serviciosDelDia.length === 0) {
+                contenedor.innerHTML = `
+                    <div class="text-center py-8 text-gray-400 bg-white rounded-xl border border-dashed p-4">
+                        <i class="far fa-calendar-times text-3xl mb-2 block text-gray-300"></i>
+                        <p class="text-sm">No hay servicios programados para este día.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            serviciosDelDia.forEach(s => {
+                const colores = obtenerColorEtiqueta(s.folio);
+                const esSubcontratado = s.representacion === 'Subcontratado';
+                const representacionBadge = esSubcontratado 
+                    ? `<span class="bg-gray-700 text-white text-[10px] px-2 py-0.5 rounded ml-2 shadow-sm font-medium">Subcontratado</span>` 
+                    : `<span class="bg-blue-100 text-blue-800 text-[10px] px-2 py-0.5 rounded ml-2 font-medium border border-blue-200">Directo (GEYSEM)</span>`;
+                
+                let htmlFotos = '';
+                if(s.fotos && s.fotos.length > 0) {
+                    s.fotos.forEach(foto => {
+                        htmlFotos += `<div class="bg-gray-100 aspect-square rounded-lg overflow-hidden border shadow-sm"><img src="${foto}" class="w-full h-full object-cover"></div>`;
+                    });
+                } else {
+                    htmlFotos = `<div class="bg-gray-50 col-span-4 py-3 text-center text-xs text-gray-400 italic rounded border border-dashed">Sin registro fotográfico adjunto.</div>`;
+                }
+
+                const htmlBotonEditar = esTecnico ? '' : `
+                    <button onclick="abrirModalEditar(${s.id})" class="absolute top-4 right-4 text-gray-500 hover:text-blue-700 bg-gray-50 hover:bg-blue-50 px-2.5 py-1.5 rounded-lg transition-all text-xs flex items-center gap-1 font-semibold border border-gray-200 shadow-sm">
+                        <i class="fas fa-edit"></i> Editar
+                    </button>
+                `;
+
+                contenedor.innerHTML += `
+                    <div class="bg-white rounded-xl shadow-sm p-5 border-t-4 ${colores.border} space-y-3 relative hover:shadow-md transition-shadow">
+                        ${htmlBotonEditar}
+
+                        <div class="flex items-center justify-between border-b pb-2 pr-20">
+                            <span class="${colores.badge} text-xs font-bold px-2.5 py-1 rounded-full border">${s.folio}</span>
+                            <div class="text-sm text-gray-600 font-bold flex items-center gap-1 bg-gray-50 px-2 py-1 rounded-md border">
+                                <i class="far fa-clock text-blue-500"></i> ${s.hora}
+                            </div>
+                        </div>
+                        <div>
+                            <h4 class="text-xs font-bold uppercase tracking-wider text-gray-400">Cliente / Empresa</h4>
+                            <div class="flex items-center mt-0.5">
+                                <p class="text-sm font-bold text-gray-800"><i class="fas fa-building text-gray-400 mr-1"></i> ${s.cliente}</p>
+                                ${representacionBadge}
+                            </div>
+                        </div>
+                        <div>
+                            <h4 class="text-xs font-bold uppercase tracking-wider text-gray-400">Dirección</h4>
+                            <p class="text-sm text-gray-700 mt-0.5 font-medium"><i class="fas fa-map-marker-alt text-red-500 mr-1"></i> ${s.direccion}</p>
+                        </div>
+                        <div>
+                            <h4 class="text-xs font-bold uppercase tracking-wider text-gray-400">Alcances</h4>
+                            <p class="text-sm text-gray-600 mt-0.5 bg-gray-50 p-2 rounded border border-gray-100">${s.alcances || 'Sin alcances definidos.'}</p>
+                        </div>
+                        ${s.notas ? `
+                        <div>
+                            <h4 class="text-xs font-bold uppercase tracking-wider text-gray-400">Notas Especiales</h4>
+                            <p class="text-sm text-amber-800 italic bg-amber-50 p-2 rounded border border-amber-200 mt-0.5">"${s.notas}"</p>
+                        </div>
+                        ` : ''}
+                        <div class="pt-2">
+                            <h4 class="text-xs font-bold uppercase tracking-wider text-gray-400 mb-2">Fotos de Campo</h4>
+                            <div class="grid grid-cols-4 sm:grid-cols-5 gap-2">
+                                ${htmlFotos}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function abrirModalNueva() {
+            if(esTecnico) return;
+            document.getElementById("modal-titulo").innerText = "Programar Nuevo Servicio";
+            document.getElementById("formulario-servicio").reset();
+            document.getElementById("input-representacion").value = "Directo GEYSEM"; // Valor por defecto
+            document.getElementById("input-id").value = "";
+            document.getElementById("btn-eliminar").classList.add("hidden");
+            document.getElementById("vista-previa-imagenes-modal").innerHTML = "";
+            document.getElementById("texto-fotos").innerText = "Haga clic para seleccionar fotos";
+            fotosTemporalesBase64 = [];
+            
+            // Si hay un día seleccionado en el calendario, pre-llenar la fecha
+            if(fechaSeleccionada) {
+                document.getElementById("input-fecha").value = formatearFechaAString(fechaSeleccionada);
+            }
+            
+            document.getElementById('modal-servicio').classList.remove('hidden');
+        }
+
+        function abrirModalEditar(id) {
+            if(esTecnico) return;
+            const servicio = serviciosDB.find(s => s.id === id);
+            if (!servicio) return;
+
+            document.getElementById("modal-titulo").innerText = "Modificar Servicio";
+            document.getElementById("input-id").value = servicio.id;
+            document.getElementById("input-cliente").value = servicio.cliente;
+            document.getElementById("input-representacion").value = servicio.representacion || "Directo GEYSEM";
+            document.getElementById("input-folio").value = servicio.folio;
+            document.getElementById("input-fecha").value = servicio.fecha;
+            document.getElementById("input-hora").value = servicio.hora;
+            document.getElementById("input-direccion").value = servicio.direccion;
+            document.getElementById("input-alcances").value = servicio.alcances;
+            document.getElementById("input-notas").value = servicio.notas;
+            
+            document.getElementById("btn-eliminar").classList.remove("hidden");
+            
+            fotosTemporalesBase64 = servicio.fotos || [];
+            document.getElementById("texto-fotos").innerText = `${fotosTemporalesBase64.length} foto(s) guardadas`;
+            
+            const vistaPrevia = document.getElementById("vista-previa-imagenes-modal");
+            vistaPrevia.innerHTML = "";
+            fotosTemporalesBase64.forEach(img => {
+                vistaPrevia.innerHTML += `<div class="bg-gray-100 aspect-square rounded-md overflow-hidden border shadow-sm"><img src="${img}" class="w-full h-full object-cover"></div>`;
+            });
+
+            document.getElementById('modal-servicio').classList.remove('hidden');
+        }
+
+        async function guardarServicio(e) {
+            e.preventDefault();
+            if(esTecnico) return;
+            const idExistente = document.getElementById("input-id").value;
+            
+            const datosServicio = {
+                cliente: document.getElementById("input-cliente").value,
+                representacion: document.getElementById("input-representacion").value,
+                folio: document.getElementById("input-folio").value.toUpperCase(),
+                fecha: document.getElementById("input-fecha").value,
+                hora: document.getElementById("input-hora").value,
+                direccion: document.getElementById("input-direccion").value,
+                alcances: document.getElementById("input-alcances").value,
+                notas: document.getElementById("input-notas").value,
+                fotos: fotosTemporalesBase64
+            };
+
+            if (idExistente) {
+                // Modificar existente
+                const index = serviciosDB.findIndex(s => s.id == idExistente);
+                if (index !== -1) {
+                    serviciosDB[index] = { id: Number(idExistente), ...datosServicio };
+                }
+            } else {
+                // Nuevo servicio (Usando Date.now() para un ID único seguro)
+                const nuevoId = Date.now();
+                serviciosDB.push({ id: nuevoId, ...datosServicio });
+            }
+
+            // Mover la selección del calendario al día del servicio guardado/modificado
+            seleccionarFecha(datosServicio.fecha);
+            
+            cerrarModal();
+            renderizarCalendario();
+            await actualizarNube();
+        }
+
+        async function eliminarServicioAccion() {
+            if(esTecnico) return;
+            const idExistente = document.getElementById("input-id").value;
+            if(!idExistente) return;
+
+            if(confirm("¿Estás seguro de que deseas borrar este servicio de la programación de forma permanente?")) {
+                serviciosDB = serviciosDB.filter(s => s.id != idExistente);
+                cerrarModal();
+                renderizarCalendario();
+                await actualizarNube();
+            }
+        }
+
+        function cambiarMes(direccion) {
+            fechaActual.setMonth(fechaActual.getMonth() + direccion);
+            renderizarCalendario();
+        }
+        
+        function irAHoy() {
+            fechaActual = new Date();
+            fechaSeleccionada = new Date();
+            renderizarCalendario();
+        }
+
+        function cerrarModal() { document.getElementById('modal-servicio').classList.add('hidden'); }
+        
+        function formatearFechaAString(date) {
+            const y = date.getFullYear();
+            const m = String(date.getMonth() + 1).padStart(2, '0');
+            const d = String(date.getDate()).padStart(2, '0');
+            return `${y}-${m}-${d}`;
+        }
+
+        // Carga inicial
+        cargarDatosNube();
+    </script>
+</body>
+</html>
