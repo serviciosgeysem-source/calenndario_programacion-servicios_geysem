@@ -91,12 +91,72 @@
         </div>
     </div>
 
-    <!-- Modal de Servicio -->
+    <!-- MODAL 1: VER SERVICIO (Hoja Grande de solo lectura) -->
+    <div id="modal-ver-servicio" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 z-40">
+        <div class="bg-gray-900 rounded-xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden flex flex-col border border-gray-700">
+            
+            <div class="p-5 border-b border-gray-800 flex items-center justify-between bg-gray-900 z-10 shadow-sm">
+                <div class="flex items-center gap-3">
+                    <h3 class="text-lg md:text-xl font-bold text-white">Detalle del Servicio</h3>
+                    <span id="ver-folio-badge" class="px-3 py-1 rounded-full text-xs font-bold border tracking-wide"></span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button id="btn-editar-desde-ver" class="hidden text-sm px-4 py-2 bg-gray-800 hover:bg-gray-700 text-blue-400 rounded-lg border border-gray-700 transition-colors font-medium flex items-center gap-2">
+                        <i class="fas fa-edit"></i> Editar
+                    </button>
+                    <button type="button" onclick="cerrarModalVer()" class="text-gray-400 hover:text-white p-2 hover:bg-gray-800 rounded-lg transition-colors">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="p-6 overflow-y-auto space-y-6 flex-1">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 bg-gray-800/50 p-5 rounded-xl border border-gray-800">
+                    <div>
+                        <h4 class="text-xs font-bold uppercase tracking-wider text-gray-500 mb-1">Cliente / Empresa</h4>
+                        <p id="ver-cliente" class="text-lg text-gray-100 font-semibold flex items-center gap-2"></p>
+                        <p id="ver-representacion" class="text-xs text-gray-400 mt-1"></p>
+                    </div>
+                    <div>
+                        <h4 class="text-xs font-bold uppercase tracking-wider text-gray-500 mb-1">Fecha y Hora de Llegada</h4>
+                        <p id="ver-fechahora" class="text-lg text-blue-400 font-medium"></p>
+                    </div>
+                    <div class="md:col-span-2">
+                        <h4 class="text-xs font-bold uppercase tracking-wider text-gray-500 mb-1">Dirección del Servicio</h4>
+                        <p id="ver-direccion" class="text-base text-gray-300 flex items-start gap-2">
+                            <i class="fas fa-map-marker-alt text-red-500 mt-1"></i>
+                            <span id="ver-direccion-texto"></span>
+                        </p>
+                    </div>
+                    <div class="md:col-span-2">
+                        <h4 class="text-xs font-bold uppercase tracking-wider text-gray-500 mb-2">Alcances</h4>
+                        <div id="ver-alcances" class="p-4 bg-gray-800 rounded-lg border border-gray-700 text-gray-200 text-sm whitespace-pre-wrap leading-relaxed shadow-inner"></div>
+                    </div>
+                    <div id="contenedor-ver-notas" class="md:col-span-2 hidden">
+                        <h4 class="text-xs font-bold uppercase tracking-wider text-gray-500 mb-2">Notas Especiales</h4>
+                        <div id="ver-notas" class="p-4 bg-amber-900/20 border border-amber-800/50 rounded-lg text-amber-400 text-sm italic whitespace-pre-wrap leading-relaxed"></div>
+                    </div>
+                </div>
+
+                <div>
+                    <div class="flex items-center gap-2 mb-4 border-b border-gray-800 pb-2">
+                        <i class="fas fa-camera-retro text-gray-400"></i>
+                        <h4 class="text-sm font-bold uppercase tracking-wider text-gray-300">Registro Fotográfico</h4>
+                    </div>
+                    <div id="ver-fotos-contenedor" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                        <!-- Las fotos se inyectarán aquí -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 2: EDITAR / NUEVO SERVICIO (Formulario) -->
     <div id="modal-servicio" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 z-50">
         <div class="bg-gray-900 rounded-xl shadow-xl max-w-lg w-full max-h-[90vh] overflow-y-auto flex flex-col border border-gray-700">
             <div class="p-5 border-b border-gray-800 flex items-center justify-between sticky top-0 bg-gray-900 z-10">
                 <h3 id="modal-titulo" class="text-lg font-bold text-white">Programar Nuevo Servicio</h3>
-                <button type="button" onclick="cerrarModal()" class="text-gray-400 hover:text-white p-1.5 hover:bg-gray-800 rounded-lg transition-colors">
+                <button type="button" onclick="cerrarModalEditar()" class="text-gray-400 hover:text-white p-1.5 hover:bg-gray-800 rounded-lg transition-colors">
                     <i class="fas fa-times text-xl"></i>
                 </button>
             </div>
@@ -150,13 +210,14 @@
                 </div>
 
                 <div>
-                    <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Fotos del Equipo</label>
+                    <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Añadir / Editar Fotos</label>
                     <div class="mt-1 relative border-2 border-gray-600 border-dashed rounded-lg p-4 hover:bg-gray-800 flex flex-col items-center justify-center cursor-pointer transition-colors bg-gray-900/50">
                         <input type="file" id="input-fotos" multiple accept="image/*" onchange="procesarFotosOndemand(event)" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
                         <i class="fas fa-camera text-gray-500 text-2xl mb-1"></i>
-                        <span id="texto-fotos" class="text-xs font-medium text-blue-400">Haga clic para seleccionar fotos</span>
+                        <span id="texto-fotos" class="text-xs font-medium text-blue-400 mt-2 text-center">Haz clic para buscar fotos nuevas en tu dispositivo</span>
                     </div>
-                    <div id="vista-previa-imagenes-modal" class="grid grid-cols-5 gap-2 mt-2"></div>
+                    <!-- Vista previa en edición -->
+                    <div id="vista-previa-imagenes-modal" class="grid grid-cols-4 gap-2 mt-3"></div>
                 </div>
 
                 <div class="pt-4 border-t border-gray-800 flex flex-col sm:flex-row justify-between gap-3">
@@ -164,12 +225,20 @@
                         <i class="fas fa-trash-alt mr-1"></i> Eliminar
                     </button>
                     <div class="flex justify-end gap-3 ml-auto w-full sm:w-auto">
-                        <button type="button" onclick="cerrarModal()" class="px-4 py-2 border border-gray-700 text-gray-300 text-sm font-medium rounded-lg hover:bg-gray-800 w-full sm:w-auto">Cancelar</button>
+                        <button type="button" onclick="cerrarModalEditar()" class="px-4 py-2 border border-gray-700 text-gray-300 text-sm font-medium rounded-lg hover:bg-gray-800 w-full sm:w-auto">Cancelar</button>
                         <button type="submit" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg shadow-sm w-full sm:w-auto">Guardar</button>
                     </div>
                 </div>
             </form>
         </div>
+    </div>
+
+    <!-- MODAL 3: VISOR DE IMÁGENES A PANTALLA COMPLETA -->
+    <div id="modal-visor-imagen" class="hidden fixed inset-0 bg-black/95 backdrop-blur-sm flex items-center justify-center z-[60] p-4 cursor-zoom-out" onclick="cerrarVisorImagen()">
+        <button class="absolute top-4 right-4 text-gray-400 hover:text-white p-2 z-[70] bg-gray-900/50 rounded-lg">
+            <i class="fas fa-times text-2xl"></i>
+        </button>
+        <img id="imagen-ampliada" src="" class="max-w-full max-h-[95vh] object-contain shadow-2xl rounded-sm" onclick="event.stopPropagation()">
     </div>
 
     <script>
@@ -196,13 +265,11 @@
             });
         }
 
-        // --- NUEVA FUNCIÓN PARA LA LEYENDA (ETIQUETAS) ---
         function toggleLeyenda(event) {
             if(event) event.stopPropagation();
             document.getElementById('popover-leyenda').classList.toggle('hidden');
         }
 
-        // Cerrar el popup de la leyenda si se hace clic afuera
         document.addEventListener('click', function(event) {
             const popover = document.getElementById('popover-leyenda');
             const boton = event.target.closest('button[onclick*="toggleLeyenda"]');
@@ -210,7 +277,6 @@
                 popover.classList.add('hidden');
             }
         });
-        // ------------------------------------------------
 
         async function cargarDatosNube() {
             try {
@@ -296,6 +362,7 @@
                 let htmlEtiquetas = '';
                 serviciosDelDia.forEach(s => {
                     const color = obtenerColorEtiqueta(s.folio);
+                    // Ahora TODOS abren la vista de detalles al hacer click en la etiqueta
                     htmlEtiquetas += `<span onclick="manejarClicEtiqueta(event, ${s.id})" class="${color.bg} ${color.text} text-[10px] px-1 py-0.5 rounded truncate block w-full mt-1 font-bold cursor-pointer hover:opacity-80 transition-opacity shadow-sm" title="${s.cliente} - ${s.representacion}">${s.folio}</span>`;
                 });
 
@@ -311,12 +378,94 @@
             actualizarVistaAgenda();
         }
 
+        // ---------- NUEVO MANEJO DE VISTAS ----------
+
         function manejarClicEtiqueta(event, id) {
             event.stopPropagation();
-            if(!esTecnico) {
-                abrirModalEditar(id);
-            }
+            abrirModalVer(id); // Abre la hoja grande de detalles para cualquiera que haga click
         }
+
+        function abrirModalVer(id) {
+            const servicio = serviciosDB.find(s => s.id === id);
+            if (!servicio) return;
+
+            // Etiquetas y Colores
+            const color = obtenerColorEtiqueta(servicio.folio);
+            const badge = document.getElementById('ver-folio-badge');
+            badge.className = `px-3 py-1 rounded-full text-xs font-bold border tracking-wide ${color.badge} ${color.border}`;
+            badge.innerText = servicio.folio;
+
+            // Textos
+            document.getElementById('ver-cliente').innerText = servicio.cliente;
+            document.getElementById('ver-representacion').innerText = servicio.representacion || "Directo (GEYSEM)";
+            
+            // Formatear Fecha
+            const [y, m, d] = servicio.fecha.split('-');
+            const dateObj = new Date(y, m - 1, d);
+            const dateStr = dateObj.toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+            document.getElementById('ver-fechahora').innerText = `${dateStr} a las ${servicio.hora} hrs`;
+
+            document.getElementById('ver-direccion-texto').innerText = servicio.direccion;
+            document.getElementById('ver-alcances').innerText = servicio.alcances || "Sin alcances detallados.";
+
+            // Notas
+            const contenedorNotas = document.getElementById('contenedor-ver-notas');
+            if(servicio.notas) {
+                contenedorNotas.classList.remove('hidden');
+                document.getElementById('ver-notas').innerText = servicio.notas;
+            } else {
+                contenedorNotas.classList.add('hidden');
+            }
+
+            // Fotos (Galería Clickable)
+            const fotosContenedor = document.getElementById('ver-fotos-contenedor');
+            fotosContenedor.innerHTML = "";
+            if (servicio.fotos && servicio.fotos.length > 0) {
+                servicio.fotos.forEach(foto => {
+                    fotosContenedor.innerHTML += `
+                        <div onclick="abrirVisorImagen('${foto}')" class="bg-gray-800 aspect-square rounded-xl overflow-hidden border-2 border-gray-700 hover:border-blue-500 shadow-sm cursor-zoom-in group relative transition-all">
+                            <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center z-10">
+                                <i class="fas fa-search-plus text-white text-2xl"></i>
+                            </div>
+                            <img src="${foto}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
+                        </div>
+                    `;
+                });
+            } else {
+                fotosContenedor.innerHTML = `<div class="col-span-full py-8 text-center text-gray-500 italic border border-dashed border-gray-700 rounded-xl bg-gray-800/30">No se adjuntaron fotografías para este servicio.</div>`;
+            }
+
+            // Botón de Edición (Oculto para Técnicos)
+            const btnEditar = document.getElementById('btn-editar-desde-ver');
+            if(!esTecnico) {
+                btnEditar.classList.remove('hidden');
+                btnEditar.onclick = () => {
+                    cerrarModalVer();
+                    abrirModalEditar(id); // Salta directo a editar
+                };
+            } else {
+                btnEditar.classList.add('hidden');
+            }
+
+            document.getElementById('modal-ver-servicio').classList.remove('hidden');
+        }
+
+        function cerrarModalVer() {
+            document.getElementById('modal-ver-servicio').classList.add('hidden');
+        }
+
+        // Lógica del Visor de Imágenes
+        function abrirVisorImagen(src) {
+            document.getElementById('imagen-ampliada').src = src;
+            document.getElementById('modal-visor-imagen').classList.remove('hidden');
+        }
+
+        function cerrarVisorImagen() {
+            document.getElementById('modal-visor-imagen').classList.add('hidden');
+            setTimeout(() => { document.getElementById('imagen-ampliada').src = ''; }, 200);
+        }
+
+        // --------------------------------------------
 
         function seleccionarFecha(fechaString) {
             fechaSeleccionada = new Date(fechaString + 'T00:00:00');
@@ -333,7 +482,7 @@
                     const img = new Image();
                     img.onload = function() {
                         const canvas = document.createElement('canvas');
-                        const MAX_WIDTH = 400; 
+                        const MAX_WIDTH = 500; // Un poco más de resolución para la vista grande
                         const scaleSize = MAX_WIDTH / img.width;
                         canvas.width = MAX_WIDTH;
                         canvas.height = img.height * scaleSize;
@@ -345,7 +494,7 @@
                         document.getElementById("texto-fotos").innerText = `${fotosTemporalesBase64.length} foto(s) preparadas`;
 
                         vistaPrevia.innerHTML += `
-                            <div class="relative bg-gray-800 aspect-square rounded-md overflow-hidden border border-gray-700 shadow-sm group">
+                            <div class="relative bg-gray-800 aspect-square rounded-md overflow-hidden border border-gray-700 shadow-sm">
                                 <img src="${dataUrlComprimida}" class="w-full h-full object-cover">
                             </div>
                         `;
@@ -382,26 +531,18 @@
                     ? `<span class="bg-gray-700 text-white text-[10px] px-2 py-0.5 rounded ml-2 shadow-sm font-medium border border-gray-600">Subcontratado</span>` 
                     : `<span class="bg-blue-900/50 text-blue-300 text-[10px] px-2 py-0.5 rounded ml-2 font-medium border border-blue-800">Directo (GEYSEM)</span>`;
                 
-                let htmlFotos = '';
-                if(s.fotos && s.fotos.length > 0) {
-                    s.fotos.forEach(foto => {
-                        htmlFotos += `<div class="bg-gray-800 aspect-square rounded-lg overflow-hidden border border-gray-700 shadow-sm"><img src="${foto}" class="w-full h-full object-cover"></div>`;
-                    });
-                } else {
-                    htmlFotos = `<div class="bg-gray-800 col-span-4 py-3 text-center text-xs text-gray-500 italic rounded border border-dashed border-gray-700">Sin registro fotográfico adjunto.</div>`;
-                }
-
-                const htmlBotonEditar = esTecnico ? '' : `
-                    <button onclick="abrirModalEditar(${s.id})" class="absolute top-4 right-4 text-gray-400 hover:text-white bg-gray-800 hover:bg-gray-700 px-2.5 py-1.5 rounded-lg transition-all text-xs flex items-center gap-1 font-semibold border border-gray-700 shadow-sm">
-                        <i class="fas fa-edit"></i> Editar
+                // Botón "Ver detalle" en lugar de "Editar" en la agenda
+                const htmlBotonVer = `
+                    <button onclick="abrirModalVer(${s.id})" class="absolute top-4 right-4 text-gray-400 hover:text-white bg-gray-800 hover:bg-gray-700 px-3 py-1.5 rounded-lg transition-all text-xs flex items-center gap-1.5 font-semibold border border-gray-700 shadow-sm z-10">
+                        <i class="fas fa-external-link-alt"></i> Ver detalle
                     </button>
                 `;
 
                 contenedor.innerHTML += `
                     <div class="bg-gray-900 rounded-xl shadow-sm p-5 border-t-4 ${colores.border} border border-gray-800 space-y-3 relative hover:shadow-md transition-shadow">
-                        ${htmlBotonEditar}
+                        ${htmlBotonVer}
 
-                        <div class="flex items-center justify-between border-b border-gray-800 pb-2 pr-20">
+                        <div class="flex items-center justify-between border-b border-gray-800 pb-2 pr-28">
                             <span class="${colores.badge} text-xs font-bold px-2.5 py-1 rounded-full border border-gray-700">${s.folio}</span>
                             <div class="text-sm text-gray-300 font-bold flex items-center gap-1 bg-gray-800 px-2 py-1 rounded-md border border-gray-700">
                                 <i class="far fa-clock text-blue-400"></i> ${s.hora}
@@ -418,22 +559,6 @@
                             <h4 class="text-xs font-bold uppercase tracking-wider text-gray-500">Dirección</h4>
                             <p class="text-sm text-gray-300 mt-0.5 font-medium"><i class="fas fa-map-marker-alt text-red-500 mr-1"></i> ${s.direccion}</p>
                         </div>
-                        <div>
-                            <h4 class="text-xs font-bold uppercase tracking-wider text-gray-500">Alcances</h4>
-                            <p class="text-sm text-gray-300 mt-0.5 bg-gray-800 p-2 rounded border border-gray-700">${s.alcances || 'Sin alcances definidos.'}</p>
-                        </div>
-                        ${s.notas ? `
-                        <div>
-                            <h4 class="text-xs font-bold uppercase tracking-wider text-gray-500">Notas Especiales</h4>
-                            <p class="text-sm text-amber-400 italic bg-amber-900/20 p-2 rounded border border-amber-800/50 mt-0.5">"${s.notas}"</p>
-                        </div>
-                        ` : ''}
-                        <div class="pt-2">
-                            <h4 class="text-xs font-bold uppercase tracking-wider text-gray-500 mb-2">Fotos de Campo</h4>
-                            <div class="grid grid-cols-4 sm:grid-cols-5 gap-2">
-                                ${htmlFotos}
-                            </div>
-                        </div>
                     </div>
                 `;
             });
@@ -447,7 +572,7 @@
             document.getElementById("input-id").value = "";
             document.getElementById("btn-eliminar").classList.add("hidden");
             document.getElementById("vista-previa-imagenes-modal").innerHTML = "";
-            document.getElementById("texto-fotos").innerText = "Haga clic para seleccionar fotos";
+            document.getElementById("texto-fotos").innerText = "Haz clic para buscar fotos nuevas en tu dispositivo";
             fotosTemporalesBase64 = [];
             
             if(fechaSeleccionada) {
@@ -516,7 +641,7 @@
 
             seleccionarFecha(datosServicio.fecha);
             
-            cerrarModal();
+            cerrarModalEditar();
             renderizarCalendario();
             await actualizarNube();
         }
@@ -528,7 +653,7 @@
 
             if(confirm("¿Estás seguro de que deseas borrar este servicio de la programación de forma permanente?")) {
                 serviciosDB = serviciosDB.filter(s => s.id != idExistente);
-                cerrarModal();
+                cerrarModalEditar();
                 renderizarCalendario();
                 await actualizarNube();
             }
@@ -545,7 +670,9 @@
             renderizarCalendario();
         }
 
-        function cerrarModal() { document.getElementById('modal-servicio').classList.add('hidden'); }
+        function cerrarModalEditar() { 
+            document.getElementById('modal-servicio').classList.add('hidden'); 
+        }
         
         function formatearFechaAString(date) {
             const y = date.getFullYear();
