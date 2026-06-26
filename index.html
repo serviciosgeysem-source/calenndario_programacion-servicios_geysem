@@ -3,58 +3,92 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calendario de Servicios - GEYSEM</title>
+    <title>Sistema de Servicios - GEYSEM</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
 </head>
-<body class="bg-black font-sans antialiased text-gray-200">
+<body class="bg-black font-sans antialiased text-gray-200 min-h-screen">
 
-    <div class="max-w-7xl mx-auto p-4 md:p-6 space-y-6">
+    <div id="pantalla-login" class="fixed inset-0 z-[100] bg-black flex items-center justify-center p-4 backdrop-blur-md">
+        <div class="bg-gray-900 border border-gray-800 p-8 rounded-2xl shadow-2xl max-w-md w-full text-center space-y-6 relative overflow-hidden">
+            <div class="absolute top-0 left-0 w-full h-1 bg-blue-600"></div>
+            
+            <div class="w-32 mx-auto bg-white p-3 rounded-xl shadow-inner">
+                <img src="descarga.png" alt="Logo GEYSEM" class="w-full h-auto object-contain">
+            </div>
+            
+            <div>
+                <h2 class="text-2xl font-bold text-white mb-1">Portal Operativo</h2>
+                <p class="text-gray-400 text-sm">Ingresa tu correo institucional para acceder</p>
+            </div>
+
+            <form onsubmit="iniciarSesion(event)" class="space-y-4 text-left">
+                <div>
+                    <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Correo Electrónico</label>
+                    <div class="relative">
+                        <i class="fas fa-envelope absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500"></i>
+                        <input type="email" id="input-correo-login" required placeholder="ejemplo@geysem.com" class="w-full pl-10 pr-3 py-3 bg-gray-800 border border-gray-700 text-white rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all outline-none">
+                    </div>
+                    <p id="error-login" class="text-red-500 text-xs font-semibold mt-2 hidden"><i class="fas fa-exclamation-triangle mr-1"></i> Correo no reconocido.</p>
+                </div>
+                
+                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-xl shadow-lg transition-colors flex items-center justify-center gap-2">
+                    Ingresar al Sistema <i class="fas fa-arrow-right"></i>
+                </button>
+            </form>
+
+            <div class="text-xs text-gray-600 text-left bg-gray-800/50 p-3 rounded-lg border border-gray-800">
+                <p class="font-bold text-gray-500 mb-1">Correos de prueba:</p>
+                <ul class="list-disc pl-4 space-y-0.5">
+                    <li>admin@geysem.com <span class="text-blue-400">(Programador)</span></li>
+                    <li>juan@geysem.com <span class="text-orange-400">(Técnico: Juan Pérez)</span></li>
+                    <li>roberto@geysem.com <span class="text-orange-400">(Técnico: Roberto)</span></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div id="app-principal" class="hidden max-w-7xl mx-auto p-4 md:p-6 space-y-6">
         
-        <!-- Encabezado y Logo -->
-        <div class="bg-gray-900 rounded-xl shadow-sm p-6 border-l-4 border-blue-600 border border-gray-800 flex flex-col md:flex-row md:items-center md:justify-between gap-4 relative z-10">
+        <div class="bg-gray-900 rounded-xl shadow-sm p-5 border-l-4 border-blue-600 border-y border-r border-gray-800 flex flex-col md:flex-row md:items-center md:justify-between gap-4 relative z-10">
             <div class="flex items-center gap-4">
-                <!-- LOGO GEYSEM -->
-                <div class="w-32 sm:w-40 flex items-center justify-center flex-shrink-0 bg-white p-2 rounded-lg">
+                <div class="w-24 sm:w-28 flex items-center justify-center flex-shrink-0 bg-white p-2 rounded-lg">
                     <img src="descarga.png" alt="Logo GEYSEM" class="w-full h-auto object-contain">
                 </div>
                 <div>
-                    <h1 class="text-2xl font-bold text-white">Control y Calendario de Servicios</h1>
-                    <p id="rol-indicador" class="text-sm text-gray-400">Flujo de programación, ejecución y resguardo de reportes</p>
+                    <h1 class="text-xl sm:text-2xl font-bold text-white leading-tight">Control y Calendario</h1>
+                    <p id="info-usuario-activo" class="text-sm text-gray-400 mt-0.5 flex items-center gap-2">
+                        </p>
                 </div>
             </div>
-            <button id="btn-nuevo-servicio" onclick="abrirModalNueva()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-lg font-medium text-sm transition-colors flex items-center justify-center gap-2 shadow-sm border border-blue-500">
-                <i class="fas fa-plus"></i> Nuevo Servicio
-            </button>
+            <div class="flex flex-wrap items-center gap-2">
+                <button id="btn-estadisticas" onclick="abrirModalEstadisticas()" class="hidden bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg font-medium text-sm transition-colors items-center justify-center gap-2 shadow-sm border border-purple-500">
+                    <i class="fas fa-chart-pie"></i> Estadísticas
+                </button>
+                <button id="btn-nuevo-servicio" onclick="abrirModalNueva()" class="hidden bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium text-sm transition-colors items-center justify-center gap-2 shadow-sm border border-blue-500">
+                    <i class="fas fa-plus"></i> Nuevo
+                </button>
+                <button onclick="cerrarSesion()" class="bg-gray-800 hover:bg-red-900 hover:text-white hover:border-red-800 text-gray-400 px-3 py-2 rounded-lg font-medium text-sm transition-colors border border-gray-700 flex items-center justify-center gap-2" title="Cerrar Sesión">
+                    <i class="fas fa-sign-out-alt"></i>
+                </button>
+            </div>
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
             
-            <!-- Calendario -->
             <div class="lg:col-span-2 bg-gray-900 rounded-xl shadow-sm p-6 space-y-4 border border-gray-800">
                 <div class="flex items-center justify-between relative">
                     <div class="flex items-center gap-3">
                         <h2 id="mes-año-titulo" class="text-lg font-bold text-white capitalize">Cargando...</h2>
                         
-                        <!-- Botón Leyenda -->
                         <div class="relative">
                             <button onclick="toggleLeyenda(event)" class="w-7 h-7 rounded-full bg-gray-800 hover:bg-gray-700 text-gray-400 hover:text-white flex items-center justify-center transition-colors border border-gray-700 shadow-sm" title="Ver colores de folios">
                                 <i class="fas fa-tag text-xs"></i>
                             </button>
                             <div id="popover-leyenda" class="hidden absolute top-full mt-2 left-0 w-64 sm:w-72 bg-gray-800 border border-gray-700 rounded-xl shadow-2xl p-4 z-50">
                                 <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">Clasificación de Folios</h3>
-                                <div class="flex flex-wrap gap-2 text-xs font-bold">
-                                    <span class="px-2 py-1 rounded bg-red-600 text-white shadow-sm">CAF</span>
-                                    <span class="px-2 py-1 rounded bg-orange-500 text-white shadow-sm">PRE</span>
-                                    <span class="px-2 py-1 rounded bg-emerald-800 text-white shadow-sm">COR</span>
-                                    <span class="px-2 py-1 rounded bg-gray-600 text-white shadow-sm">INS</span>
-                                    <span class="px-2 py-1 rounded bg-green-500 text-white shadow-sm">REV</span>
-                                    <span class="px-2 py-1 rounded bg-yellow-500 text-gray-900 shadow-sm">DIG</span>
-                                    <span class="px-2 py-1 rounded bg-purple-500 text-white shadow-sm">ACT</span>
-                                    <span class="px-2 py-1 rounded bg-sky-500 text-white shadow-sm">PUE</span>
-                                    <span class="px-2 py-1 rounded bg-pink-500 text-white shadow-sm">ESP</span>
-                                    <span class="px-2 py-1 rounded bg-amber-600 text-white shadow-sm">EME</span>
-                                </div>
+                                <div id="leyenda-contenedor" class="flex flex-wrap gap-2 text-xs font-bold">
+                                    </div>
                             </div>
                         </div>
                     </div>
@@ -73,7 +107,6 @@
                 <div id="calendario-dias" class="grid grid-cols-7 gap-2 text-sm"></div>
             </div>
             
-            <!-- Agenda del Día -->
             <div class="space-y-4">
                 <div class="flex items-center justify-between px-1">
                     <h2 class="text-lg font-bold text-white flex items-center gap-2">
@@ -81,7 +114,7 @@
                         <span id="agenda-titulo">Agenda del día</span>
                     </h2>
                     <button onclick="cargarDatosNube()" class="text-xs bg-gray-800 hover:bg-gray-700 text-gray-300 px-2 py-1 rounded transition-colors flex items-center gap-1 shadow-sm border border-gray-700">
-                        <i class="fas fa-sync-alt"></i> Sincronizar
+                        <i class="fas fa-sync-alt"></i> Sync
                     </button>
                 </div>
                 <div id="agenda-servicios-contenedor" class="space-y-4"></div>
@@ -89,10 +122,65 @@
         </div>
     </div>
 
-    <!-- MODAL 1: VER SERVICIO Y FLUJO TÉCNICO -->
+    <div id="modal-estadisticas" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+        <div class="bg-gray-900 rounded-xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden flex flex-col border border-gray-700">
+            <div class="p-5 border-b border-gray-800 flex items-center justify-between bg-gray-900 z-10">
+                <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                    <i class="fas fa-chart-bar text-purple-500"></i> Estadísticas del Mes: <span id="stats-mes-titulo" class="text-purple-400 capitalize"></span>
+                </h3>
+                <button type="button" onclick="cerrarModalEstadisticas()" class="text-gray-400 hover:text-white p-1.5 hover:bg-gray-800 rounded-lg transition-colors">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            
+            <div class="p-6 overflow-y-auto flex-1 bg-gray-900 space-y-6">
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div class="bg-gray-800 border border-gray-700 p-4 rounded-xl flex items-center gap-4">
+                        <div class="w-12 h-12 rounded-full bg-blue-900/50 text-blue-400 flex items-center justify-center text-xl"><i class="fas fa-clipboard-list"></i></div>
+                        <div>
+                            <p class="text-xs text-gray-400 uppercase font-bold tracking-wider">Total Servicios</p>
+                            <p id="stat-total-servicios" class="text-2xl font-bold text-white">0</p>
+                        </div>
+                    </div>
+                    <div class="bg-gray-800 border border-gray-700 p-4 rounded-xl flex items-center gap-4">
+                        <div class="w-12 h-12 rounded-full bg-green-900/50 text-green-400 flex items-center justify-center text-xl"><i class="fas fa-check-circle"></i></div>
+                        <div>
+                            <p class="text-xs text-gray-400 uppercase font-bold tracking-wider">Finalizados</p>
+                            <p id="stat-total-finalizados" class="text-2xl font-bold text-white">0</p>
+                        </div>
+                    </div>
+                    <div class="bg-gray-800 border border-gray-700 p-4 rounded-xl flex items-center gap-4">
+                        <div class="w-12 h-12 rounded-full bg-orange-900/50 text-orange-400 flex items-center justify-center text-xl"><i class="fas fa-clock"></i></div>
+                        <div>
+                            <p class="text-xs text-gray-400 uppercase font-bold tracking-wider">Pendientes</p>
+                            <p id="stat-total-pendientes" class="text-2xl font-bold text-white">0</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="bg-gray-800 border border-gray-700 rounded-xl p-5">
+                        <h4 class="text-sm font-bold text-white border-b border-gray-700 pb-3 mb-4 flex items-center gap-2">
+                            <i class="fas fa-users text-gray-400"></i> Productividad por Técnico
+                        </h4>
+                        <div id="contenedor-stats-tecnicos" class="space-y-3">
+                            </div>
+                    </div>
+
+                    <div class="bg-gray-800 border border-gray-700 rounded-xl p-5">
+                        <h4 class="text-sm font-bold text-white border-b border-gray-700 pb-3 mb-4 flex items-center gap-2">
+                            <i class="fas fa-fire text-orange-500"></i> Servicios Más Frecuentes (Top Folios)
+                        </h4>
+                        <div id="contenedor-stats-folios" class="space-y-3">
+                            </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div id="modal-ver-servicio" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 z-40">
         <div class="bg-gray-900 rounded-xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden flex flex-col border border-gray-700 relative">
-            
             <div class="p-5 border-b border-gray-800 flex items-center justify-between bg-gray-900 z-10 shadow-sm">
                 <div class="flex items-center gap-3">
                     <h3 class="text-lg md:text-xl font-bold text-white">Detalle del Servicio</h3>
@@ -110,8 +198,6 @@
             </div>
             
             <div class="p-6 overflow-y-auto space-y-6 flex-1">
-                
-                <!-- Acciones del Flujo de Trabajo (Solo visibles según estado y rol) -->
                 <div id="panel-flujo-trabajo" class="hidden bg-blue-900/20 border border-blue-800/50 rounded-xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
                     <div>
                         <h4 id="flujo-mensaje-titulo" class="text-sm font-bold text-blue-400">Acción Requerida</h4>
@@ -120,7 +206,6 @@
                     <button id="btn-accion-flujo" class="px-5 py-2.5 rounded-lg font-bold text-sm shadow-md transition-all whitespace-nowrap"></button>
                 </div>
 
-                <!-- Formulario para subir reporte final (Oculto por defecto) -->
                 <div id="panel-subir-reporte" class="hidden bg-gray-800 border border-gray-700 rounded-xl p-5 space-y-4">
                     <h4 class="text-sm font-bold text-white border-b border-gray-700 pb-2"><i class="fas fa-clipboard-check text-green-500 mr-2"></i>Cierre de Servicio y Reporte</h4>
                     <div>
@@ -138,7 +223,6 @@
                     </div>
                 </div>
 
-                <!-- Detalles base del servicio -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 bg-gray-800/50 p-5 rounded-xl border border-gray-800">
                     <div>
                         <h4 class="text-xs font-bold uppercase tracking-wider text-gray-500 mb-1">Cliente / Empresa</h4>
@@ -162,7 +246,6 @@
                     </div>
                 </div>
 
-                <!-- Sección de Reporte Finalizado (Solo visible si está cerrado) -->
                 <div id="contenedor-reporte-historico" class="hidden border-t border-gray-700 pt-6">
                     <div class="flex items-center gap-2 mb-4">
                         <i class="fas fa-file-signature text-green-500 text-xl"></i>
@@ -174,11 +257,10 @@
                     </div>
                 </div>
 
-                <!-- Galería Combinada -->
                 <div>
                     <div class="flex items-center gap-2 mb-4 border-b border-gray-800 pb-2 mt-6">
                         <i class="fas fa-camera-retro text-gray-400"></i>
-                        <h4 class="text-sm font-bold uppercase tracking-wider text-gray-300">Registro Fotográfico (Previo y Final)</h4>
+                        <h4 class="text-sm font-bold uppercase tracking-wider text-gray-300">Registro Fotográfico</h4>
                     </div>
                     <div id="ver-fotos-contenedor" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4"></div>
                 </div>
@@ -186,7 +268,6 @@
         </div>
     </div>
 
-    <!-- MODAL 2: EDITAR / NUEVO SERVICIO (Admin) -->
     <div id="modal-servicio" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 z-50">
         <div class="bg-gray-900 rounded-xl shadow-xl max-w-lg w-full max-h-[90vh] overflow-y-auto flex flex-col border border-gray-700">
             <div class="p-5 border-b border-gray-800 flex items-center justify-between sticky top-0 bg-gray-900 z-10">
@@ -213,10 +294,7 @@
                         <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Técnico Asignado</label>
                         <select id="input-tecnico" required class="w-full px-3 py-2 bg-gray-800 border border-gray-700 text-white rounded-lg text-sm">
                             <option value="">Seleccionar...</option>
-                            <option value="Técnico General">Técnico General</option>
-                            <option value="Juan Pérez">Juan Pérez</option>
-                            <option value="Roberto Sánchez">Roberto Sánchez</option>
-                        </select>
+                            </select>
                     </div>
                 </div>
 
@@ -242,7 +320,7 @@
                 </div>
 
                 <div>
-                    <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Fotos Previas (Admin)</label>
+                    <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Fotos Previas</label>
                     <div class="mt-1 relative border-2 border-gray-600 border-dashed rounded-lg p-4 hover:bg-gray-800 flex flex-col items-center justify-center cursor-pointer transition-colors bg-gray-900/50">
                         <input type="file" id="input-fotos" multiple accept="image/*" onchange="procesarFotosOndemand(event)" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
                         <i class="fas fa-camera text-gray-500 text-2xl mb-1"></i>
@@ -257,53 +335,112 @@
                     </button>
                     <div class="flex justify-end gap-3 ml-auto w-full sm:w-auto">
                         <button type="button" onclick="cerrarModalEditar()" class="px-4 py-2 border border-gray-700 text-gray-300 text-sm font-medium rounded-lg hover:bg-gray-800 w-full sm:w-auto">Cancelar</button>
-                        <button type="submit" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg shadow-sm w-full sm:w-auto">Guardar Programa</button>
+                        <button type="submit" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg shadow-sm w-full sm:w-auto">Guardar</button>
                     </div>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- MODAL 3: VISOR DE IMÁGENES -->
     <div id="modal-visor-imagen" class="hidden fixed inset-0 bg-black/95 backdrop-blur-sm flex items-center justify-center z-[60] p-4 cursor-zoom-out" onclick="cerrarVisorImagen()">
-        <button class="absolute top-4 right-4 text-gray-400 hover:text-white p-2 z-[70] bg-gray-900/50 rounded-lg">
-            <i class="fas fa-times text-2xl"></i>
-        </button>
+        <button class="absolute top-4 right-4 text-gray-400 hover:text-white p-2 z-[70] bg-gray-900/50 rounded-lg"><i class="fas fa-times text-2xl"></i></button>
         <img id="imagen-ampliada" src="" class="max-w-full max-h-[95vh] object-contain shadow-2xl rounded-sm" onclick="event.stopPropagation()">
     </div>
 
     <script>
+        // --- BASE DE DATOS DE USUARIOS (SIMULADA) ---
+        const USUARIOS_DB = {
+            "admin@geysem.com": { rol: "programador", nombre: "Administrador Central" },
+            "juan@geysem.com": { rol: "tecnico", nombre: "Juan Pérez" },
+            "roberto@geysem.com": { rol: "tecnico", nombre: "Roberto Sánchez" }
+        };
+
+        let usuarioActual = null; // Guardará quién inició sesión
+
+        // --- VARIABLES DEL CALENDARIO ---
         const meses = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
         let fechaActual = new Date();
         let fechaSeleccionada = new Date();
         let fotosTemporalesBase64 = []; 
-        let fotosReporteTemporales = []; // Para el reporte del técnico
         let serviciosDB = [];
         let servicioViendoActualmente = null;
 
-        // DETERMINACIÓN DE PERMISOS (Agrega ?rol=tecnico a la URL para ver la vista del trabajador)
-        const urlParams = new URLSearchParams(window.location.search);
-        const esTecnico = urlParams.get('rol') === 'tecnico';
-
-        // NUBE SIMULADA JSONBin
+        // NUBE SIMULADA
         const BIN_ID = "66786c47ad19ca34f87da645"; 
         const API_URL = `https://api.jsonbin.io/v3/b/${BIN_ID}`;
         const API_KEY = "$2a$10$wR63P9bU.Vb1SgPq8m/OQ.3R1zR/X8FhZfREbXf5nUuSihzTf29mO"; 
 
-        if (esTecnico) {
-            document.addEventListener("DOMContentLoaded", () => {
-                document.getElementById("btn-nuevo-servicio").classList.add("hidden");
-                document.getElementById("rol-indicador").innerText = "Vista de Trabajo para Técnicos (Confirmación y Reportes)";
-                document.getElementById("rol-indicador").classList.add("text-amber-500", "font-semibold");
+        // --- SISTEMA DE LOGIN Y SESIÓN ---
+        document.addEventListener("DOMContentLoaded", () => {
+            // Llenar dinámicamente el selector de técnicos en el modal de nuevo servicio
+            const selectTecnico = document.getElementById('input-tecnico');
+            Object.values(USUARIOS_DB).forEach(u => {
+                if(u.rol === 'tecnico') {
+                    selectTecnico.innerHTML += `<option value="${u.nombre}">${u.nombre}</option>`;
+                }
             });
+            generarLeyendaColores(); // Llena el popover de etiquetas
+        });
+
+        function iniciarSesion(e) {
+            e.preventDefault();
+            const email = document.getElementById('input-correo-login').value.trim().toLowerCase();
+            const user = USUARIOS_DB[email];
+
+            if (user) {
+                usuarioActual = user;
+                document.getElementById('error-login').classList.add('hidden');
+                
+                // Ocultar Login, Mostrar App
+                document.getElementById('pantalla-login').classList.add('hidden');
+                document.getElementById('app-principal').classList.remove('hidden');
+
+                // Configurar Interfaz según Rol
+                const badgeRol = user.rol === 'programador' 
+                    ? `<span class="bg-blue-900 text-blue-300 text-[10px] px-2 py-0.5 rounded border border-blue-700 uppercase font-bold ml-2">Programador</span>`
+                    : `<span class="bg-orange-900 text-orange-300 text-[10px] px-2 py-0.5 rounded border border-orange-700 uppercase font-bold ml-2">Técnico</span>`;
+                
+                document.getElementById('info-usuario-activo').innerHTML = `<i class="fas fa-user-circle text-gray-500 text-lg"></i> ${user.nombre} ${badgeRol}`;
+
+                if (user.rol === 'programador') {
+                    document.getElementById("btn-nuevo-servicio").classList.remove("hidden");
+                    document.getElementById("btn-nuevo-servicio").classList.add("flex");
+                    document.getElementById("btn-estadisticas").classList.remove("hidden");
+                    document.getElementById("btn-estadisticas").classList.add("flex");
+                }
+
+                // Cargar datos reales
+                cargarDatosNube();
+            } else {
+                document.getElementById('error-login').classList.remove('hidden');
+            }
         }
 
-        // ---------- LÓGICA DE BASE Y CALENDARIO (Simplificada para el ejemplo) ----------
-        function toggleLeyenda(event) {
-            if(event) event.stopPropagation();
-            document.getElementById('popover-leyenda').classList.toggle('hidden');
+        function cerrarSesion() {
+            usuarioActual = null;
+            document.getElementById('input-correo-login').value = '';
+            document.getElementById('app-principal').classList.add('hidden');
+            document.getElementById('pantalla-login').classList.remove('hidden');
+            
+            // Limpiar botones UI
+            document.getElementById("btn-nuevo-servicio").classList.add("hidden");
+            document.getElementById("btn-nuevo-servicio").classList.remove("flex");
+            document.getElementById("btn-estadisticas").classList.add("hidden");
+            document.getElementById("btn-estadisticas").classList.remove("flex");
         }
 
+        // --- FILTRADO DE SERVICIOS POR USUARIO ---
+        function obtenerServiciosVisibles() {
+            if (!usuarioActual) return [];
+            if (usuarioActual.rol === 'programador') {
+                return serviciosDB; // Admin ve todo
+            } else {
+                // Técnico solo ve lo suyo
+                return serviciosDB.filter(s => s.tecnico === usuarioActual.nombre);
+            }
+        }
+
+        // --- LÓGICA DE DATOS Y CALENDARIO ---
         async function cargarDatosNube() {
             try {
                 const res = await fetch(API_URL, { headers: { "X-Master-Key": API_KEY } });
@@ -311,7 +448,7 @@
                 serviciosDB = data.record.servicios || [];
                 renderizarCalendario();
             } catch (err) {
-                console.error("Error nube, usando local", err);
+                console.error("Error nube", err);
                 serviciosDB = JSON.parse(localStorage.getItem('geysem_servicios')) || [];
                 renderizarCalendario();
             }
@@ -328,25 +465,7 @@
             } catch (err) { console.error("Error subir", err); }
         }
 
-        function obtenerColorEtiqueta(folio) {
-            if (!folio) return { bg: 'bg-gray-500', text: 'text-white', border: 'border-gray-500', badge: 'bg-gray-200 text-gray-800' };
-            const tresLetras = folio.trim().substring(0, 3).toUpperCase();
-            switch (tresLetras) {
-                case "CAF": return { bg: 'bg-red-600', text: 'text-white', border: 'border-red-600', badge: 'bg-red-100 text-red-800' };
-                // ... (resto de colores iguales)
-                default: return { bg: 'bg-blue-600', text: 'text-white', border: 'border-blue-600', badge: 'bg-blue-100 text-blue-800' };
-            }
-        }
-
-        function obtenerColorEstado(estado) {
-            switch(estado) {
-                case 'Pendiente': return 'bg-orange-500/20 text-orange-400 border-orange-500/50';
-                case 'Confirmado': return 'bg-blue-500/20 text-blue-400 border-blue-500/50';
-                case 'Finalizado': return 'bg-green-500/20 text-green-400 border-green-500/50';
-                default: return 'bg-gray-500/20 text-gray-400 border-gray-500/50';
-            }
-        }
-
+        // --- RENDERIZADO DEL CALENDARIO ---
         function renderizarCalendario() {
             const año = fechaActual.getFullYear();
             const mes = fechaActual.getMonth();
@@ -358,44 +477,43 @@
 
             const contenedorDias = document.getElementById("calendario-dias");
             contenedorDias.innerHTML = "";
-            const fechaHoy = new Date();
-            const stringHoy = formatearFechaAString(fechaHoy);
+            const stringHoy = formatearFechaAString(new Date());
 
             for (let i = primerDiaMes; i > 0; i--) {
-                contenedorDias.innerHTML += `<div class="h-28 p-1 text-gray-500 bg-gray-300 border border-gray-400 rounded-lg text-left opacity-50"></div>`;
+                contenedorDias.innerHTML += `<div class="h-28 p-1 bg-gray-800 border border-gray-800 rounded-lg opacity-30"></div>`;
             }
+
+            const misServicios = obtenerServiciosVisibles(); // <--- FILTRO APLICADO AQUI
 
             for (let dia = 1; dia <= totalDiasMes; dia++) {
                 const mesFormateado = String(mes + 1).padStart(2, '0');
                 const diaFormateado = String(dia).padStart(2, '0');
                 const fechaId = `${año}-${mesFormateado}-${diaFormateado}`;
 
-                const serviciosDelDia = serviciosDB.filter(s => s.fecha === fechaId);
+                const serviciosDelDia = misServicios.filter(s => s.fecha === fechaId);
                 const esSeleccionado = fechaId === formatearFechaAString(fechaSeleccionada);
                 const esHoyReal = fechaId === stringHoy;
 
-                let claseCelda = 'bg-gray-200 border-gray-300 hover:bg-gray-300 text-gray-800';
-                let estiloDiaNumero = 'text-xs font-bold text-gray-700';
+                let claseCelda = 'bg-gray-900 border-gray-800 hover:bg-gray-800 text-gray-400';
+                let estiloDiaNumero = 'text-xs font-bold';
 
-                if (esSeleccionado) { claseCelda = 'ring-2 ring-blue-500 bg-gray-300 text-gray-900 border-transparent'; } 
+                if (esSeleccionado) { claseCelda = 'ring-1 ring-blue-500 bg-gray-800 text-white border-transparent'; } 
                 else if (esHoyReal) {
-                    claseCelda = 'border-2 border-blue-600 bg-gray-100 text-gray-900 shadow-sm';
-                    estiloDiaNumero = 'text-sm font-extrabold bg-blue-600 text-white rounded-full w-6 h-6 flex items-center justify-center shadow-md';
+                    claseCelda = 'border border-blue-600 bg-blue-900/10 text-white shadow-sm';
+                    estiloDiaNumero = 'text-sm font-extrabold bg-blue-600 text-white rounded-full w-6 h-6 flex items-center justify-center';
                 }
 
                 let htmlEtiquetas = '';
                 serviciosDelDia.forEach(s => {
                     const color = obtenerColorEtiqueta(s.folio);
-                    // Icono según estado
-                    let icono = s.estado === 'Finalizado' ? '<i class="fas fa-check-circle mr-1"></i>' : (s.estado === 'Confirmado' ? '<i class="fas fa-eye mr-1"></i>' : '');
-                    // Opacidad si es pendiente y soy admin
-                    let opacidad = (s.estado === 'Pendiente') ? 'opacity-70 border border-dashed border-white' : 'shadow-sm';
+                    let icono = s.estado === 'Finalizado' ? '<i class="fas fa-check-circle mr-1 text-green-300"></i>' : (s.estado === 'Confirmado' ? '<i class="fas fa-eye mr-1 text-blue-300"></i>' : '');
+                    let opacidad = (s.estado === 'Pendiente') ? 'opacity-70 border border-dashed border-gray-400' : 'shadow-sm';
                     
                     htmlEtiquetas += `<span onclick="abrirModalVer(${s.id}, event)" class="${color.bg} ${color.text} ${opacidad} text-[10px] px-1 py-0.5 rounded truncate block w-full mt-1 font-bold cursor-pointer hover:opacity-100 transition-opacity" title="${s.cliente}">${icono}${s.folio}</span>`;
                 });
 
                 contenedorDias.innerHTML += `
-                    <div onclick="seleccionarFecha('${fechaId}')" class="h-28 p-1.5 ${claseCelda} font-medium rounded-lg transition-all cursor-pointer border flex flex-col text-left overflow-hidden shadow-sm">
+                    <div onclick="seleccionarFecha('${fechaId}')" class="h-28 p-1.5 ${claseCelda} font-medium rounded-lg transition-all cursor-pointer border flex flex-col text-left overflow-hidden">
                         <div class="${estiloDiaNumero} mb-1">${dia}</div>
                         <div class="w-full overflow-y-auto space-y-0.5 flex-1 scrollbar-none">
                             ${htmlEtiquetas}
@@ -406,176 +524,17 @@
             actualizarVistaAgenda();
         }
 
-        // ---------- LÓGICA DE VISTAS Y FLUJO TÉCNICO ----------
-
-        function abrirModalVer(id, event) {
-            if(event) event.stopPropagation();
-            const servicio = serviciosDB.find(s => s.id === id);
-            if (!servicio) return;
-            servicioViendoActualmente = id;
-
-            // Header info
-            const color = obtenerColorEtiqueta(servicio.folio);
-            document.getElementById('ver-folio-badge').className = `px-3 py-1 rounded-full text-xs font-bold border tracking-wide ${color.badge} ${color.border}`;
-            document.getElementById('ver-folio-badge').innerText = servicio.folio;
-
-            // Estado Badge
-            const estadoClase = obtenerColorEstado(servicio.estado || 'Pendiente');
-            document.getElementById('ver-estado-badge').className = `px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wider ml-2 border ${estadoClase}`;
-            document.getElementById('ver-estado-badge').innerText = servicio.estado || 'Pendiente';
-
-            // Datos Base
-            document.getElementById('ver-cliente').innerText = servicio.cliente;
-            document.getElementById('ver-tecnico').innerText = servicio.tecnico || 'No asignado';
-            document.getElementById('ver-fechahora').innerText = `${servicio.fecha} a las ${servicio.hora} hrs`;
-            document.getElementById('ver-direccion-texto').innerText = servicio.direccion;
-            document.getElementById('ver-alcances').innerText = servicio.alcances || "Sin alcances detallados.";
-
-            // Configurar Flujo (Botones de Técnico)
-            const panelFlujo = document.getElementById('panel-flujo-trabajo');
-            const btnAccion = document.getElementById('btn-accion-flujo');
-            const panelReporte = document.getElementById('panel-subir-reporte');
-            const panelHistorico = document.getElementById('contenedor-reporte-historico');
-            
-            panelFlujo.classList.add('hidden');
-            panelReporte.classList.add('hidden');
-            panelHistorico.classList.add('hidden');
-
-            if (esTecnico) {
-                if (servicio.estado === 'Pendiente' || !servicio.estado) {
-                    panelFlujo.classList.remove('hidden');
-                    panelFlujo.className = "bg-orange-900/20 border border-orange-800/50 rounded-xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4 mb-6";
-                    document.getElementById('flujo-mensaje-titulo').innerText = "Nuevo Servicio Asignado";
-                    document.getElementById('flujo-mensaje-titulo').className = "text-sm font-bold text-orange-400";
-                    document.getElementById('flujo-mensaje-texto').innerText = "Confirma de enterado para que todos vean que estás a cargo.";
-                    
-                    btnAccion.innerText = "Confirmar Enterado";
-                    btnAccion.className = "px-5 py-2.5 bg-orange-600 hover:bg-orange-700 text-white rounded-lg font-bold text-sm shadow-md transition-all whitespace-nowrap";
-                    btnAccion.onclick = () => cambiarEstadoServicio(id, 'Confirmado');
-                } 
-                else if (servicio.estado === 'Confirmado') {
-                    panelFlujo.classList.remove('hidden');
-                    panelFlujo.className = "bg-blue-900/20 border border-blue-800/50 rounded-xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4 mb-6";
-                    document.getElementById('flujo-mensaje-titulo').innerText = "Servicio en Ejecución";
-                    document.getElementById('flujo-mensaje-titulo').className = "text-sm font-bold text-blue-400";
-                    document.getElementById('flujo-mensaje-texto').innerText = "Al terminar, redacta tu reporte y sube la evidencia fotográfica final.";
-                    
-                    btnAccion.innerText = "Crear Reporte de Cierre";
-                    btnAccion.className = "px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-bold text-sm shadow-md transition-all whitespace-nowrap";
-                    btnAccion.onclick = () => {
-                        panelFlujo.classList.add('hidden');
-                        panelReporte.classList.remove('hidden');
-                    };
-                }
-            }
-
-            // Si ya está finalizado, mostrar el reporte histórico para Admin y Técnico
-            if (servicio.estado === 'Finalizado') {
-                panelHistorico.classList.remove('hidden');
-                document.getElementById('texto-reporte-historico').innerText = servicio.reporteFinal || 'Sin reporte escrito adjunto.';
-            }
-
-            // Fotos (Combina originales del admin + finales del técnico)
-            const fotosContenedor = document.getElementById('ver-fotos-contenedor');
-            fotosContenedor.innerHTML = "";
-            let todasLasFotos = [];
-            if(servicio.fotos) todasLasFotos = todasLasFotos.concat(servicio.fotos);
-            if(servicio.fotosFinales) todasLasFotos = todasLasFotos.concat(servicio.fotosFinales);
-
-            if (todasLasFotos.length > 0) {
-                todasLasFotos.forEach((foto, idx) => {
-                    // Ponemos un pequeño tag visual si es de cierre (solo heurística simple basada en index si quisiéramos)
-                    fotosContenedor.innerHTML += `
-                        <div onclick="abrirVisorImagen('${foto}')" class="bg-gray-800 aspect-square rounded-xl overflow-hidden border-2 border-gray-700 hover:border-blue-500 shadow-sm cursor-zoom-in group relative transition-all">
-                            <img src="${foto}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
-                        </div>
-                    `;
-                });
-            } else {
-                fotosContenedor.innerHTML = `<div class="col-span-full py-4 text-center text-gray-500 italic border border-dashed border-gray-700 rounded-xl">Sin fotografías adjuntas.</div>`;
-            }
-
-            // Botón Editar para Admin
-            const btnEditar = document.getElementById('btn-editar-desde-ver');
-            if(!esTecnico && servicio.estado !== 'Finalizado') {
-                btnEditar.classList.remove('hidden');
-                btnEditar.onclick = () => { cerrarModalVer(); abrirModalEditar(id); };
-            } else {
-                btnEditar.classList.add('hidden');
-            }
-
-            document.getElementById('modal-ver-servicio').classList.remove('hidden');
-        }
-
-        async function cambiarEstadoServicio(id, nuevoEstado) {
-            const index = serviciosDB.findIndex(s => s.id === id);
-            if(index !== -1) {
-                serviciosDB[index].estado = nuevoEstado;
-                await actualizarNube();
-                renderizarCalendario();
-                cerrarModalVer();
-                abrirModalVer(id, null); // Recargar la vista actual
-            }
-        }
-
-        async function guardarReporteFinal() {
-            const id = servicioViendoActualmente;
-            const index = serviciosDB.findIndex(s => s.id === id);
-            if(index === -1) return;
-
-            const textoReporte = document.getElementById('input-reporte-final').value;
-            
-            // Procesar las fotos seleccionadas en el input del reporte final
-            const fileInput = document.getElementById('input-fotos-finales');
-            const promesasBase64 = Array.from(fileInput.files).map(archivo => {
-                return new Promise((resolve) => {
-                    const lector = new FileReader();
-                    lector.onload = e => {
-                        const img = new Image();
-                        img.onload = () => {
-                            const canvas = document.createElement('canvas');
-                            const scale = 600 / img.width; // Resolución comprimida
-                            canvas.width = 600;
-                            canvas.height = img.height * scale;
-                            const ctx = canvas.getContext('2d');
-                            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-                            resolve(canvas.toDataURL('image/jpeg', 0.7));
-                        };
-                        img.src = e.target.result;
-                    };
-                    lector.readAsDataURL(archivo);
-                });
-            });
-
-            const fotosFinalesBase64 = await Promise.all(promesasBase64);
-
-            // Guardar en DB
-            serviciosDB[index].estado = 'Finalizado';
-            serviciosDB[index].reporteFinal = textoReporte;
-            serviciosDB[index].fotosFinales = fotosFinalesBase64;
-
-            await actualizarNube();
-            renderizarCalendario();
-            cerrarModalVer();
-        }
-
-        // ---------- RESTO DE FUNCIONES (SIMILARES AL ANTERIOR) ----------
-
-        function cerrarModalVer() { document.getElementById('modal-ver-servicio').classList.add('hidden'); }
-        function abrirVisorImagen(src) { document.getElementById('imagen-ampliada').src = src; document.getElementById('modal-visor-imagen').classList.remove('hidden'); }
-        function cerrarVisorImagen() { document.getElementById('modal-visor-imagen').classList.add('hidden'); }
-        function seleccionarFecha(fechaString) { fechaSeleccionada = new Date(fechaString + 'T00:00:00'); renderizarCalendario(); }
-        
         function actualizarVistaAgenda() {
             const fechaString = formatearFechaAString(fechaSeleccionada);
             document.getElementById("agenda-titulo").innerText = fechaSeleccionada.toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
 
-            const serviciosDelDia = serviciosDB.filter(s => s.fecha === fechaString);
+            const misServicios = obtenerServiciosVisibles();
+            const serviciosDelDia = misServicios.filter(s => s.fecha === fechaString);
             const contenedor = document.getElementById("agenda-servicios-contenedor");
             contenedor.innerHTML = "";
 
             if (serviciosDelDia.length === 0) {
-                contenedor.innerHTML = `<div class="text-center py-8 text-gray-500 bg-gray-900 rounded-xl border border-dashed border-gray-700 p-4">No hay servicios programados.</div>`;
+                contenedor.innerHTML = `<div class="text-center py-8 text-gray-500 bg-gray-900 rounded-xl border border-dashed border-gray-800 p-4">No hay servicios programados para este día.</div>`;
                 return;
             }
 
@@ -584,114 +543,36 @@
                 const colorEst = obtenerColorEstado(s.estado || 'Pendiente');
 
                 contenedor.innerHTML += `
-                    <div class="bg-gray-900 rounded-xl shadow-sm p-5 border-t-4 ${colores.border} border border-gray-800 space-y-3 relative">
-                        <button onclick="abrirModalVer(${s.id})" class="absolute top-4 right-4 text-gray-400 hover:text-white bg-gray-800 px-3 py-1.5 rounded-lg text-xs font-semibold border border-gray-700">Ver detalle</button>
+                    <div class="bg-gray-900 rounded-xl shadow-sm p-5 border-t-4 ${colores.border} border border-gray-800 space-y-3 relative hover:bg-gray-800/50 transition-colors">
+                        <button onclick="abrirModalVer(${s.id})" class="absolute top-4 right-4 text-gray-400 hover:text-white bg-gray-800 hover:bg-gray-700 px-3 py-1.5 rounded-lg text-xs font-semibold border border-gray-700 transition-colors">Ver detalle</button>
                         <div class="flex items-center gap-2 border-b border-gray-800 pb-2 pr-24">
-                            <span class="${colores.badge} text-xs font-bold px-2 py-1 rounded-full">${s.folio}</span>
+                            <span class="${colores.badge} text-xs font-bold px-2 py-1 rounded-full border border-gray-700">${s.folio}</span>
                             <span class="${colorEst} text-[10px] font-bold px-2 py-1 rounded border uppercase">${s.estado || 'Pendiente'}</span>
                         </div>
                         <div>
-                            <p class="text-sm font-bold text-gray-100"><i class="fas fa-building text-gray-400 mr-1"></i> ${s.cliente}</p>
-                            <p class="text-xs text-gray-400 mt-1"><i class="fas fa-user-cog mr-1"></i> ${s.tecnico || 'Sin asignar'} - <i class="far fa-clock ml-2 mr-1"></i> ${s.hora} hrs</p>
+                            <p class="text-sm font-bold text-white"><i class="fas fa-building text-gray-500 mr-1"></i> ${s.cliente}</p>
+                            <p class="text-xs text-gray-400 mt-1.5 flex items-center gap-3">
+                                <span><i class="fas fa-user-cog text-gray-600 mr-1"></i> ${s.tecnico || 'Sin asignar'}</span>
+                                <span><i class="far fa-clock text-blue-500 mr-1"></i> ${s.hora} hrs</span>
+                            </p>
                         </div>
                     </div>
                 `;
             });
         }
 
-        // FUNCIONES ADMIN (NUEVO/EDITAR)
-        function procesarFotosOndemand(event) {
-            const archivos = event.target.files;
-            Array.from(archivos).forEach(archivo => {
-                const lector = new FileReader();
-                lector.onload = function(e) {
-                    const img = new Image();
-                    img.onload = function() {
-                        const canvas = document.createElement('canvas');
-                        const scale = 500 / img.width;
-                        canvas.width = 500; canvas.height = img.height * scale;
-                        canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
-                        fotosTemporalesBase64.push(canvas.toDataURL('image/jpeg', 0.6));
-                        document.getElementById("texto-fotos").innerText = `${fotosTemporalesBase64.length} foto(s) adjuntas`;
-                    };
-                    img.src = e.target.result;
-                };
-                lector.readAsDataURL(archivo);
+        // --- LÓGICA DE ESTADÍSTICAS (ADMIN) ---
+        function abrirModalEstadisticas() {
+            const mesStr = meses[fechaActual.getMonth()];
+            document.getElementById('stats-mes-titulo').innerText = mesStr;
+
+            const mesIndex = fechaActual.getMonth();
+            const añoIndex = fechaActual.getFullYear();
+            
+            // Filtrar servicios solo del mes actual en vista
+            const serviciosMes = serviciosDB.filter(s => {
+                const [y, m] = s.fecha.split('-');
+                return parseInt(m) - 1 === mesIndex && parseInt(y) === añoIndex;
             });
-        }
 
-        function abrirModalNueva() {
-            if(esTecnico) return;
-            document.getElementById("formulario-servicio").reset();
-            document.getElementById("input-id").value = "";
-            document.getElementById("btn-eliminar").classList.add("hidden");
-            fotosTemporalesBase64 = [];
-            if(fechaSeleccionada) document.getElementById("input-fecha").value = formatearFechaAString(fechaSeleccionada);
-            document.getElementById('modal-servicio').classList.remove('hidden');
-        }
-
-        function abrirModalEditar(id) {
-            if(esTecnico) return;
-            const s = serviciosDB.find(x => x.id === id);
-            if (!s) return;
-            document.getElementById("input-id").value = s.id;
-            document.getElementById("input-cliente").value = s.cliente;
-            document.getElementById("input-folio").value = s.folio;
-            document.getElementById("input-tecnico").value = s.tecnico || "";
-            document.getElementById("input-fecha").value = s.fecha;
-            document.getElementById("input-hora").value = s.hora;
-            document.getElementById("input-direccion").value = s.direccion;
-            document.getElementById("input-alcances").value = s.alcances;
-            fotosTemporalesBase64 = s.fotos || [];
-            document.getElementById("btn-eliminar").classList.remove("hidden");
-            document.getElementById('modal-servicio').classList.remove('hidden');
-        }
-
-        async function guardarServicio(e) {
-            e.preventDefault();
-            if(esTecnico) return;
-            const idExistente = document.getElementById("input-id").value;
-            const datos = {
-                cliente: document.getElementById("input-cliente").value,
-                folio: document.getElementById("input-folio").value.toUpperCase(),
-                tecnico: document.getElementById("input-tecnico").value,
-                fecha: document.getElementById("input-fecha").value,
-                hora: document.getElementById("input-hora").value,
-                direccion: document.getElementById("input-direccion").value,
-                alcances: document.getElementById("input-alcances").value,
-                fotos: fotosTemporalesBase64,
-                estado: idExistente ? (serviciosDB.find(s=>s.id==idExistente).estado || 'Pendiente') : 'Pendiente'
-            };
-
-            if (idExistente) {
-                const index = serviciosDB.findIndex(s => s.id == idExistente);
-                serviciosDB[index] = { ...serviciosDB[index], ...datos };
-            } else {
-                serviciosDB.push({ id: Date.now(), ...datos });
-            }
-            seleccionarFecha(datos.fecha);
-            cerrarModalEditar();
-            renderizarCalendario();
-            await actualizarNube();
-        }
-
-        async function eliminarServicioAccion() {
-            if(esTecnico) return;
-            const id = document.getElementById("input-id").value;
-            if(confirm("¿Borrar este servicio de forma permanente?")) {
-                serviciosDB = serviciosDB.filter(s => s.id != id);
-                cerrarModalEditar();
-                renderizarCalendario();
-                await actualizarNube();
-            }
-        }
-
-        function cambiarMes(dir) { fechaActual.setMonth(fechaActual.getMonth() + dir); renderizarCalendario(); }
-        function irAHoy() { fechaActual = new Date(); fechaSeleccionada = new Date(); renderizarCalendario(); }
-        function cerrarModalEditar() { document.getElementById('modal-servicio').classList.add('hidden'); }
-        function formatearFechaAString(date) { return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`; }
-
-        cargarDatosNube();
-    </script>
-</body>
-</html>
+            // Tarjetas Super
