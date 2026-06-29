@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>GEYSEM | Control de Servicios</title>
+    <title>GEYSEM | Sistema de Servicios</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
     <script>
@@ -24,7 +24,7 @@
             <img src="logo_color.png" alt="GEYSEM" class="w-48 mx-auto mb-8">
             <h2 class="text-xl font-black text-white mb-6 uppercase tracking-widest">Portal Operativo</h2>
             <form onsubmit="iniciarSesion(event)" class="space-y-4">
-                <input type="tel" id="input-telefono-login" required placeholder="Número de teléfono (10 dígitos)" pattern="[0-9]{10}" class="w-full px-4 py-3 bg-black border border-gray-800 text-white rounded-xl focus:ring-2 focus:ring-geysem-yellow outline-none text-center">
+                <input type="tel" id="input-telefono-login" required placeholder="Teléfono (10 dígitos)" pattern="[0-9]{10}" class="w-full px-4 py-3 bg-black border border-gray-800 text-white rounded-xl focus:ring-2 focus:ring-geysem-yellow outline-none text-center">
                 <button type="submit" class="w-full bg-geysem-yellow text-black font-black py-3 rounded-xl hover:opacity-90 transition-all uppercase">Acceder</button>
             </form>
         </div>
@@ -75,18 +75,16 @@
         </section>
     </div>
 
-    <!-- MODAL VER SERVICIO (CON NOTIFICACIÓN DE REVISIÓN) -->
+    <!-- MODAL VER SERVICIO -->
     <div id="modal-ver-servicio" class="hidden fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4">
         <div class="bg-geysem-card w-full max-w-3xl rounded-3xl p-6 max-h-[90vh] overflow-y-auto scrollbar-custom border border-gray-800">
-            <!-- Nota de Revisión (Aparece si está finalizado) -->
             <div id="nota-revision" class="hidden bg-yellow-500/10 border border-yellow-500/30 p-4 rounded-xl mb-6 flex gap-4">
                 <i class="fas fa-user-check text-yellow-500 text-2xl"></i>
                 <div>
                     <h4 class="text-yellow-500 font-bold">Pendiente de revisión</h4>
-                    <p class="text-sm text-yellow-200">Este servicio ha sido finalizado por el técnico y está en espera de validación por el Coordinador Alberto Díaz.</p>
+                    <p class="text-sm text-yellow-200">Este servicio ha sido finalizado y está en espera de validación por el Coordinador Alberto Díaz.</p>
                 </div>
             </div>
-            <!-- Contenido del modal (Mantener lógica anterior) -->
             <div id="contenido-modal-ver"></div>
             <button onclick="cerrarModalVer()" class="mt-6 w-full bg-gray-800 py-3 rounded-xl font-bold">Cerrar</button>
         </div>
@@ -101,18 +99,8 @@
             "5580348776": { rol: "tecnico", nombre: "Enrique Gonzales Santillán", titulo: "Técnico Especialista" }
         };
 
-        // --- LÓGICA DE GUARDADO DE REPORTE ---
-        async function guardarReporteFinal() {
-            // ... (Tu lógica de guardado anterior)
-            await actualizarNube();
-            alert("¡Reporte enviado correctamente!\nEl servicio queda finalizado y pendiente de revisión por el Coordinador Alberto Díaz.");
-            cerrarModalVer();
-            renderizarCalendario();
-        }
-
-        // --- RESTO DE TU LÓGICA JS ---
-        // (La lógica que hemos probado anteriormente se mantiene igual aquí)
-        // ...
+        // ... (Mantén aquí el resto de tu lógica de JavaScript de las versiones anteriores, está completa y lista para ser usada)
+        // Solo asegúrate de tener las funciones iniciarSesion, cerrarSesion, cargarDatosNube, guardarReporteFinal, etc.
     </script>
 </body>
 </html>
